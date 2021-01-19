@@ -5,7 +5,7 @@ const PORT = 8080; // default port 8080
 // Set view engine
 app.set("view engine", "ejs");
 
-// bodyParser middleware - To ask: What exactly does this do?
+// bodyParser middleware
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
@@ -47,7 +47,7 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] }; // To ask: What is req.params?
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
   res.render("urls_show", templateVars);
 });
 
@@ -67,7 +67,7 @@ app.get("/u/:shortURL", (req, res) => {
 app.post("/urls", (req, res) => {
   console.log(req.body);  // Log the POST request body to the console
   const shortURL = generateRandomString();
-  urlDatabase[shortURL] = req.body.longURL; // To ask: Why don't we need to JSON parse this?
+  urlDatabase[shortURL] = req.body.longURL;
   res.redirect(`/urls/${shortURL}`)
 });
 // End Routes
