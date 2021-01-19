@@ -17,11 +17,17 @@ const urlDatabase = {
 
 // short URL generator function
 const generateRandomString = function() {
-  var result           = '';
-  var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  var charactersLength = characters.length;
-  for ( var i = 0; i < 6; i++ ) {
-     result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  let result           = '';
+  let characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let redo = true;
+  while(redo) {
+    for ( let i = 0; i < 6; i++ ) {
+      result += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    redo = false;
+    for (const key of Object.keys(urlDatabase)) {
+      if (key === result) redo = true;
+    }
   }
   return result;
 }
@@ -55,7 +61,9 @@ app.get("/hello", (req, res) => {
 
 app.post("/urls", (req, res) => {
   console.log(req.body);  // Log the POST request body to the console
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
+  const shortURL = generateRandomString();
+  urlDatabase[shortURL] = req.body.longURL; // To ask: Why don't we need to JSON parse this?
+  res.redirect(`/urls/${shortURL}`)
 });
 // End Routes
 
