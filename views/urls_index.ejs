@@ -29,9 +29,9 @@
             <td><%= url %></td>
             <td><%= urls[url] %></td>
             <td>
-              <form method="GET" action="/urls/<%=url%>">
+              <a href="/urls/<%=url%>">
                 <button type="submit" class="btn btn-outline-success">Edit</button>
-              </form>
+              </a>
             </td>
             <td>
               <form method="POST" action="/urls/<%=url%>/delete">
