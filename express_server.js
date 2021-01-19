@@ -5,9 +5,13 @@ const PORT = 8080; // default port 8080
 // Set view engine
 app.set("view engine", "ejs");
 
-// bodyParser middleware
+// body parser middleware
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
+
+// cookie parser middleware
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
 
 // pseudo-database
 const urlDatabase = {
