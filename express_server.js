@@ -70,6 +70,12 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.redirect('/urls');
 });
 
+app.post("/urls/:id", (req, res) => {
+  const shortURL = req.params.id;
+  urlDatabase[shortURL] = req.body.longURL;
+  res.redirect(`/urls/${shortURL}`)
+});
+
 app.post("/urls", (req, res) => {
   console.log(req.body);  // Log the POST request body to the console
   const shortURL = generateRandomString();
