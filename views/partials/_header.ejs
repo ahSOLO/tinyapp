@@ -11,24 +11,28 @@
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
-    </div>
-    <!-- Login / Username Display -->
-    <div class="col-4">
-      <% if (username) { %>
-        <h6 class="mb-1 ml-1 mr-3">Welcome, <%= username %></h6>
-        <form action="/logout" method="POST">
-          <button type="submit" class="btn btn-primary">Logout</button>
-        </form>
-        <% } else { %>
-        <form action="/login" method="POST">
+      <div class="col-sm-10 ml-sm-0 col-md-5 col-lg-3 ml-md-auto">
+        <!-- Login / Username Display -->
+        <% if (username) { %>
           <div class="input-group">
-            <input class="form-control" type="text" name="username" placeholder="Please enter your username">
-            <span class="input-group-btn">
-              <button type="submit" class="btn btn-primary">Login</button>
-            </span>
+            <h6 class="mt-2 ml-1 mr-3">Welcome, <%= username %></h6>
+            <form action="/logout" method="POST">
+              <span class="input-group-btn">
+                <button type="submit" class="btn btn-primary">Logout</button>
+              </span>
+            </form>
           </div>
-        </form>
-      <% } %>
+          <% } else { %>
+          <form action="/login" method="POST">
+            <div class="input-group">
+              <input class="form-control" type="text" name="username" placeholder="Please enter your username">
+              <span class="input-group-btn">
+                <button type="submit" class="btn btn-primary">Login</button>
+              </span>
+            </div>
+          </form>
+        <% } %>
+      </div>
     </div>
   </nav>
 </header>
