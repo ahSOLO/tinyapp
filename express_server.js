@@ -36,7 +36,7 @@ const generateRandomString = function() {
   return result;
 }
 
-// Begin Routes
+// Get Routes
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -75,6 +75,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.redirect('/urls');
 });
 
+// Post Routes
 app.post("/urls/:id", (req, res) => {
   const shortURL = req.params.id;
   urlDatabase[shortURL] = req.body.longURL;

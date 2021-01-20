@@ -15,6 +15,7 @@
   <main style="margin: 1em;">
     <h3>My URLs</h3>
     <table class="table">
+      <!-- Table Headers -->
       <thead>
         <tr>
           <th scope="col">Short URL</th>
@@ -23,6 +24,7 @@
           <th scope="col">Delete</th>
         </tr>
       </thead>
+      <!-- Table Body -->
       <tbody>
         <% for(let url in urls) { %>
           <tr>
@@ -43,7 +45,7 @@
       </tbody>
     </table>
     <h3> Shorten a new URL </h3>
-    <a href="#"><p>Click here to shorten a new URL</p></a>
+    <a href="/urls/new"><p>Click here to shorten a new URL</p></a>
   </main>
   <!-- Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
