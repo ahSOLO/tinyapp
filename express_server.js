@@ -3,7 +3,10 @@ const app = express();
 const PORT = 8080; // default port 8080
 
 // Import utility functions
-const { generateRandomString } = require("./utility");
+const { 
+  generateRandomString,
+  getUserByEmail,
+ } = require("./utility");
 
 // Set view engine
 app.set("view engine", "ejs");
@@ -36,13 +39,18 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  const templateVars = { user: users[req.cookies.userId] }
+  const templateVars = { user: users[req.cookies.userId] };
   res.render("urls_new", templateVars);
 });
 
 app.get("/urls/register", (req, res) => {
   const templateVars = { user: users[req.cookies.userId] };
   res.render("urls_register", templateVars);
+});
+
+app.get("/urls/login", (req, res) => {
+  const templateVars = { user: users[req.cookies.userId] };
+  res.render("urls_login", templateVars);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
@@ -63,13 +71,19 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
+app.get('*', (req, res) => {
+  const templateVars = { user: users[req.cookies.userId] };
+  res.render('404', templateVars)
+})
+
+// Post Routes
+
 app.post("/urls/:shortURL/delete", (req, res) => {
   const shortURL = req.params.shortURL;
   delete urlDatabase[shortURL];
   res.redirect('/urls');
 });
 
-// Post Routes
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString(urlDatabase);
   urlDatabase[shortURL] = req.body.longURL;
@@ -86,32 +100,27 @@ app.post("/login", (req, res) => {
   const user = users[req.cookies.userId];
   res.cookie('userId', user);
   res.redirect('/urls');
-})
+});
 
 app.post("/logout", (req, res) => {
   res.clearCookie('userId');
   res.redirect('/urls');
-})
+});
 
 app.post("/register", (req, res) => {
   const userId = generateRandomString(users);
   if (!(req.body.email) || !(req.body.password) ) {
-    res.status(404);
-    res.redirect('/urls/register');
+    res.redirect('/404')
     return;
   }
-  for (let user in users) {
-    if (users[user].email === req.body.email) {
-      res.status(404);
-      res.redirect('/urls/register');
-      return;
-    }
+  if (getUserByEmail(users, req.body.email)) {
+    res.redirect('/404')
+    return;
   }
   users[userId] = { id: userId, email: req.body.email, password: req.body.password };
   res.cookie('userId', userId);
   res.redirect('/urls');
-})
-
+});
 
 // End Routes
 

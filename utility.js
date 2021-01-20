@@ -14,4 +14,15 @@ const generateRandomString = function(object) {
   return result;
 }
 
-module.exports = { generateRandomString }
+const getUserByEmail = function(users, email) {
+  for (let user in users) {
+    if (users[user].email === email) {
+      return user;
+    }
+  }
+}
+
+module.exports = { 
+  generateRandomString,
+  getUserByEmail,
+ }
