@@ -1,5 +1,8 @@
 const express = require("express");
 const app = express();
+
+const bcrypt = require('bcrypt');
+
 const PORT = 8080;
 
 const { 
@@ -14,6 +17,12 @@ app.set("view engine", "ejs");
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
+// const cookieSession = require("cookie-session");
+// app.use(cookieSession({
+//   name: 'session',
+//   keys: [],
+// }))
+
 const cookieParser = require("cookie-parser");
 app.use(cookieParser());
 
@@ -23,13 +32,7 @@ const urlDatabase = {
   "9sm5xK": { longURL: "http://www.google.com", userId: "1a1a1a" }
 };
 
-const users = {
-  "1a1a1a": {
-    id: "1a1a1a",
-    email: 'example@user.com',
-    password: '1234',
-  }
-};
+const users = {};
 
 // GET ROUTES
 
@@ -153,7 +156,8 @@ app.post("/register", (req, res) => {
     res.redirect('/400');
     return;
   }
-  users[userId] = { id: userId, email: req.body.email, password: req.body.password };
+  const hashedPass = bcrypt.hashSync(req.body.password, 10);
+  users[userId] = { id: userId, email: req.body.email, password: hashedPass };
   res.cookie('userId', userId);
   res.redirect('/urls');
 });
@@ -163,7 +167,7 @@ app.post("/login", (req, res) => {
   if (!userId) {
     res.redirect('/403');
   }
-  if (users[userId]["password"] === req.body.password){
+  if (bcrypt.compareSync(req.body.password, users[userId]["password"])) {
     res.cookie('userId', userId);
     res.redirect('/urls');
   }
