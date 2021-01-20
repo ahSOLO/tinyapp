@@ -1,4 +1,4 @@
-const generateRandomString = function() {
+const generateRandomString = function(object) {
   let result           = '';
   let characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let redo = true;
@@ -7,7 +7,7 @@ const generateRandomString = function() {
       result += characters.charAt(Math.floor(Math.random() * characters.length));
     }
     redo = false;
-    for (const key of Object.keys(urlDatabase)) {
+    for (const key of Object.keys(object)) {
       if (key === result) redo = true;
     }
   }

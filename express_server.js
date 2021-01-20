@@ -22,28 +22,31 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+// users object
+const users = {};
+
 // Get Routes
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase, username: req.cookies.username };
+  const templateVars = { urls: urlDatabase, user: users[req.cookies.userId] };
   res.render('urls_index', templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  const templateVars = { username: req.cookies.username }
+  const templateVars = { user: users[req.cookies.userId] }
   res.render("urls_new", templateVars);
 });
 
 app.get("/urls/register", (req, res) => {
-  const templateVars = { username: req.cookies.username };
+  const templateVars = { user: users[req.cookies.userId] };
   res.render("urls_register", templateVars);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], username: req.cookies.username };
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], user: users[req.cookies.userId] };
   res.render("urls_show", templateVars);
 });
 
@@ -67,28 +70,36 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 });
 
 // Post Routes
+app.post("/urls", (req, res) => {
+  const shortURL = generateRandomString(urlDatabase);
+  urlDatabase[shortURL] = req.body.longURL;
+  res.redirect(`/urls/${shortURL}`)
+});
+
 app.post("/urls/:id", (req, res) => {
   const shortURL = req.params.id;
   urlDatabase[shortURL] = req.body.longURL;
   res.redirect(`/urls/${shortURL}`)
 });
 
-app.post("/urls", (req, res) => {
-  const shortURL = generateRandomString();
-  urlDatabase[shortURL] = req.body.longURL;
-  res.redirect(`/urls/${shortURL}`)
-});
-
 app.post("/login", (req, res) => {
-  const username = req.body.username;
-  res.cookie('username', username);
+  const user = users[req.cookies.userId];
+  res.cookie('userId', user);
   res.redirect('/urls');
 })
 
 app.post("/logout", (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie('userId');
   res.redirect('/urls');
 })
+
+app.post("/register", (req, res) => {
+  const userId = generateRandomString(users);
+  users[userId] = { id: userId, email: req.body.email, password: req.body.password };
+  res.cookie('userId', userId);
+  res.redirect('/urls');
+})
+
 
 // End Routes
 
