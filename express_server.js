@@ -95,6 +95,18 @@ app.post("/logout", (req, res) => {
 
 app.post("/register", (req, res) => {
   const userId = generateRandomString(users);
+  if (!(req.body.email) || !(req.body.password) ) {
+    res.status(404);
+    res.redirect('/urls/register');
+    return;
+  }
+  for (let user in users) {
+    if (users[user].email === req.body.email) {
+      res.status(404);
+      res.redirect('/urls/register');
+      return;
+    }
+  }
   users[userId] = { id: userId, email: req.body.email, password: req.body.password };
   res.cookie('userId', userId);
   res.redirect('/urls');
