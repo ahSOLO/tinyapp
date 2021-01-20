@@ -1,3 +1,4 @@
+// Generates string for use as IDs for shortURLs and users
 const generateRandomString = function(object) {
   let result           = '';
   let characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -7,6 +8,7 @@ const generateRandomString = function(object) {
       result += characters.charAt(Math.floor(Math.random() * characters.length));
     }
     redo = false;
+    // Check for duplicates
     for (const key of Object.keys(object)) {
       if (key === result) redo = true;
     }
