@@ -43,12 +43,12 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 });
 
-app.get("/urls/register", (req, res) => {
+app.get("/register", (req, res) => {
   const templateVars = { user: users[req.cookies.userId] };
   res.render("urls_register", templateVars);
 });
 
-app.get("/urls/login", (req, res) => {
+app.get("/login", (req, res) => {
   const templateVars = { user: users[req.cookies.userId] };
   res.render("urls_login", templateVars);
 });
@@ -73,13 +73,19 @@ app.get("/u/:shortURL", (req, res) => {
 
 app.get('/400', (req, res) => {
   const templateVars = { user: users[req.cookies.userId] };
-  res.statusCode('400');
+  res.status('400');
   res.render('400', templateVars);
+})
+
+app.get('/403', (req, res) => {
+  const templateVars = { user: users[req.cookies.userId] };
+  res.status('403');
+  res.render('403', templateVars);
 })
 
 app.get('*', (req, res) => {
   const templateVars = { user: users[req.cookies.userId] };
-  res.statusCode('404');
+  res.status('404');
   res.render('404', templateVars);
 })
 
@@ -94,19 +100,13 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString(urlDatabase);
   urlDatabase[shortURL] = req.body.longURL;
-  res.redirect(`/urls/${shortURL}`)
+  res.redirect(`/urls/${shortURL}`);
 });
 
 app.post("/urls/:id", (req, res) => {
   const shortURL = req.params.id;
   urlDatabase[shortURL] = req.body.longURL;
-  res.redirect(`/urls/${shortURL}`)
-});
-
-app.post("/login", (req, res) => {
-  const user = users[req.cookies.userId];
-  res.cookie('userId', user);
-  res.redirect('/urls');
+  res.redirect(`/urls/${shortURL}`);
 });
 
 app.post("/logout", (req, res) => {
@@ -117,16 +117,30 @@ app.post("/logout", (req, res) => {
 app.post("/register", (req, res) => {
   const userId = generateRandomString(users);
   if (!(req.body.email) || !(req.body.password) ) {
-    res.redirect('/400')
+    res.redirect('/400');
     return;
   }
   if (getUserByEmail(users, req.body.email)) {
-    res.redirect('/400')
+    res.redirect('/400');
     return;
   }
   users[userId] = { id: userId, email: req.body.email, password: req.body.password };
   res.cookie('userId', userId);
   res.redirect('/urls');
+});
+
+app.post("/login", (req, res) => {
+  const userId = getUserByEmail(users, req.body.email);
+  if (!userId) {
+    res.redirect('/403');
+  }
+  if (users[userId]["password"] === req.body.password){
+    res.cookie('userId', userId);
+    res.redirect('/urls');
+  }
+  else {
+    res.redirect('/403');
+  }
 });
 
 // End Routes

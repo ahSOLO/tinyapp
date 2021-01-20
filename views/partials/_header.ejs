@@ -15,7 +15,7 @@
         <!-- Login / Username Display -->
         <% if (user) { %>
           <div class="input-group">
-            <h6 class="mt-2 ml-1 mr-3">You are logged in as <%= user.email %></h6>
+            <h6 class="mt-2 ml-1 mr-3">Logged in as <%= user.email %></h6>
             <form action="/logout" method="POST">
               <span class="input-group-btn">
                 <button type="submit" class="btn btn-primary">Logout</button>
@@ -23,10 +23,10 @@
             </form>
           </div>
           <% } else { %>
-          <a href="/urls/login">
+          <a class="float-right mr-auto" href="/login">
             <button type="submit" class="btn btn-primary">Login</button>
           </a>
-          <a href="/urls/register">
+          <a class="float-right mr-3" href="/register">
             <button type="submit" class="btn btn-primary">Register</button>
           </a>
         <% } %>
