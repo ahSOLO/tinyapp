@@ -50,6 +50,9 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
+  if (!req.cookies.userId) {
+    res.redirect("/login");
+  }
   const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]["longURL"], user: users[req.cookies.userId] };
   res.render("urls_show", templateVars);
 });
@@ -125,8 +128,13 @@ app.post("/urls", (req, res) => {
 // Update URL
 app.post("/urls/:id", (req, res) => {
   const shortURL = req.params.id;
-  urlDatabase[shortURL] = { longURL: req.body.longURL, userId: req.cookies.userId };
-  res.redirect(`/urls/${shortURL}`);
+  if (req.cookies.userId === urlDatabase[shortURL]["userId"]) {
+    urlDatabase[shortURL] = { longURL: req.body.longURL, userId: req.cookies.userId };
+    res.redirect(`/urls/${shortURL}`);
+  }
+  else {
+    res.redirect('/403');
+  }
 });
 
 // Authentication routes

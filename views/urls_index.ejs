@@ -13,42 +13,45 @@
 </header>
 <body>
   <main style="margin: 1em;">
-    <h3>My URLs</h3>
-    <table class="table">
-      <!-- Table Headers -->
-      <thead>
-        <tr>
-          <th scope="col">Short URL</th>
-          <th scope="col">Long URL</th>
-          <th scope="col">Edit</th>
-          <th scope="col">Delete</th>
-        </tr>
-      </thead>
-      <!-- Table Body -->
-      <tbody>
-        <% for(let url in urls) { %>
+    <% if (user) { %> 
+      <h3>My URLs</h3>
+      <table class="table">
+        <!-- Table Headers -->
+        <thead>
           <tr>
-            <td><%= url %></td>
-            <td><%= urls[url]["longURL"] %></td>
-            <td>
-              <a href="/urls/<%=url%>">
-                <button type="submit" class="btn btn-outline-success">Edit</button>
-              </a>
-            </td>
-            <td>
-              <form method="POST" action="/urls/<%=url%>/delete">
-                <button type="submit" class="btn btn-outline-danger">Delete</button>
-              </form>
-            </td>
+            <th scope="col">Short URL</th>
+            <th scope="col">Long URL</th>
+            <th scope="col">Edit</th>
+            <th scope="col">Delete</th>
           </tr>
-        <% } %>
-      </tbody>
-    </table>
-    <h3> Shorten a new URL </h3>
+        </thead>
+        <!-- Table Body -->
+        <tbody>
+          <% for(let url in urls) { %>
+            <tr>
+              <td><%= url %></td>
+              <td><%= urls[url]["longURL"] %></td>
+              <td>
+                <a href="/urls/<%=url%>">
+                  <button type="submit" class="btn btn-outline-success">Edit</button>
+                </a>
+              </td>
+              <td>
+                <form method="POST" action="/urls/<%=url%>/delete">
+                  <button type="submit" class="btn btn-outline-danger">Delete</button>
+                </form>
+              </td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    <% } %> 
     <% if (user) { %>
+      <h3> Shorten a new URL </h3>
       <a href="/urls/new"><p>Click here to shorten a new URL</p></a>
     <% } else { %> 
-      <p> To shorten a new url, please <a href="/login">log in</a> or <a href="/register">create an account</a>.</p>
+      <h3> Welcome to TinyApp, a URL shortening service!</h3>
+      <p> To view saved short URLs or to shorten an new URL, please <a href="/login">log in</a> or <a href="/register">create an account</a>.</p>
     <% } %>
   </main>
   <!-- Bootstrap JS -->
