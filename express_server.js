@@ -6,6 +6,7 @@ const PORT = 8080; // default port 8080
 const { 
   generateRandomString,
   getUserByEmail,
+  getUrlsByUserId,
  } = require("./utility");
 
 // Set view engine
@@ -21,12 +22,18 @@ app.use(cookieParser());
 
 // pseudo-database
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userId: "1a1a1a" },
+  "9sm5xK": { longURL: "http://www.google.com", userId: "1a1a1a" }
 };
 
 // users object
-const users = {};
+const users = {
+  "1a1a1a": {
+    id: "1a1a1a",
+    email: 'example@user.com',
+    password: '1234',
+  }
+};
 
 // Get Routes
 app.get("/", (req, res) => {
@@ -34,12 +41,17 @@ app.get("/", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase, user: users[req.cookies.userId] };
+  const userId = req.cookies.userId;
+  const urls = getUrlsByUserId(urlDatabase, userId);
+  const templateVars = { urls: urls, user: users[userId] };
   res.render('urls_index', templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
   const templateVars = { user: users[req.cookies.userId] };
+  if (!req.cookies.userId) {
+    res.redirect("/login");
+  }
   res.render("urls_new", templateVars);
 });
 
@@ -54,7 +66,7 @@ app.get("/login", (req, res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], user: users[req.cookies.userId] };
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]["longURL"], user: users[req.cookies.userId] };
   res.render("urls_show", templateVars);
 });
 
@@ -67,7 +79,7 @@ app.get("/urls/:shortURL", (req, res) => {
 // });
 
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
+  const longURL = urlDatabase[req.params.shortURL]["longURL"];
   res.redirect(longURL);
 });
 
@@ -93,19 +105,24 @@ app.get('*', (req, res) => {
 
 app.post("/urls/:shortURL/delete", (req, res) => {
   const shortURL = req.params.shortURL;
-  delete urlDatabase[shortURL];
-  res.redirect('/urls');
+  if (req.cookies.userId === urlDatabase[shortURL]["userId"]) {
+    delete urlDatabase[shortURL];
+    res.redirect('/urls');
+  }
+  else {
+    res.redirect('/403');
+  }
 });
 
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString(urlDatabase);
-  urlDatabase[shortURL] = req.body.longURL;
+  urlDatabase[shortURL] = { longURL: req.body.longURL, userId: req.cookies.userId };
   res.redirect(`/urls/${shortURL}`);
 });
 
 app.post("/urls/:id", (req, res) => {
   const shortURL = req.params.id;
-  urlDatabase[shortURL] = req.body.longURL;
+  urlDatabase[shortURL] = { longURL: req.body.longURL, userId: req.cookies.userId };
   res.redirect(`/urls/${shortURL}`);
 });
 

@@ -29,7 +29,7 @@
         <% for(let url in urls) { %>
           <tr>
             <td><%= url %></td>
-            <td><%= urls[url] %></td>
+            <td><%= urls[url]["longURL"] %></td>
             <td>
               <a href="/urls/<%=url%>">
                 <button type="submit" class="btn btn-outline-success">Edit</button>
@@ -45,7 +45,11 @@
       </tbody>
     </table>
     <h3> Shorten a new URL </h3>
-    <a href="/urls/new"><p>Click here to shorten a new URL</p></a>
+    <% if (user) { %>
+      <a href="/urls/new"><p>Click here to shorten a new URL</p></a>
+    <% } else { %> 
+      <p> To shorten a new url, please <a href="/login">log in</a> or <a href="/register">create an account</a>.</p>
+    <% } %>
   </main>
   <!-- Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

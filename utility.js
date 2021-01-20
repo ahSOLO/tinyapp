@@ -22,7 +22,18 @@ const getUserByEmail = function(users, email) {
   }
 }
 
+const getUrlsByUserId = function(urls, id) {
+  let output = {};
+  for (let url in urls) {
+    if (urls[url]["userId"] === id) {
+      output[url] = urls[url];
+    }
+  }
+  return output;
+}
+
 module.exports = { 
   generateRandomString,
   getUserByEmail,
+  getUrlsByUserId,
  }
