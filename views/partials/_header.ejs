@@ -9,13 +9,14 @@
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
-    <% if (username) { %>
-      <h6 class="mb-1 ml-1 mr-3">Welcome, <%= username %></h6>
-      <form action="/logout" method="POST">
-        <button type="submit" class="btn btn-primary">Logout</button>
-      </form>
-      <% } else { %> 
-      <div class="col-3">
+    </div>
+    <div class="col-4">
+      <% if (username) { %>
+        <h6 class="mb-1 ml-1 mr-3">Welcome, <%= username %></h6>
+        <form action="/logout" method="POST">
+          <button type="submit" class="btn btn-primary">Logout</button>
+        </form>
+        <% } else { %> 
         <form action="/login" method="POST">
           <div class="input-group">
             <input class="form-control" type="text" name="username" placeholder="Please enter your username">
@@ -24,8 +25,7 @@
             </span>
           </div>
         </form>
-      </div>
-    <% } %> 
+      <% } %> 
     </div>
   </nav>
 </header>
