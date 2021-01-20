@@ -71,9 +71,16 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
+app.get('/400', (req, res) => {
+  const templateVars = { user: users[req.cookies.userId] };
+  res.statusCode('400');
+  res.render('400', templateVars);
+})
+
 app.get('*', (req, res) => {
   const templateVars = { user: users[req.cookies.userId] };
-  res.render('404', templateVars)
+  res.statusCode('404');
+  res.render('404', templateVars);
 })
 
 // Post Routes
@@ -110,11 +117,11 @@ app.post("/logout", (req, res) => {
 app.post("/register", (req, res) => {
   const userId = generateRandomString(users);
   if (!(req.body.email) || !(req.body.password) ) {
-    res.redirect('/404')
+    res.redirect('/400')
     return;
   }
   if (getUserByEmail(users, req.body.email)) {
-    res.redirect('/404')
+    res.redirect('/400')
     return;
   }
   users[userId] = { id: userId, email: req.body.email, password: req.body.password };
