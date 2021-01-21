@@ -9,18 +9,18 @@ const bcrypt = require('bcrypt');
 const PORT = 8080;
 
 // Import Helper Functions
-const { 
+const {
   generateRandomString,
   getUserByEmail,
   getUrlsByUserId,
   recordAnalytics,
- } = require("./helper");
+} = require("./helper");
 
 app.set("view engine", "ejs");
 
 // Middleware: method-override, body-parser, cookie-parser
 const methodOverride = require('method-override');
-app.use(methodOverride('_method'))
+app.use(methodOverride('_method'));
 
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
@@ -29,7 +29,7 @@ const cookieSession = require("cookie-session");
 app.use(cookieSession({
   name: 'session',
   keys: ["LighthouseLabs"],
-}))
+}));
 
 // Pseudo-database for URLs and users:
 const urlDatabase = {};
@@ -58,27 +58,27 @@ app.get("/urls/:shortURL", (req, res) => {
     return res.redirect("/login");
   }
   // Check that short URL exists
-  if (!Object.keys(urlDatabase).includes(req.params.shortURL)){
+  if (!Object.keys(urlDatabase).includes(req.params.shortURL)) {
     return res.status(404).redirect("/404");
   }
   let uniqueVisitorsTotal = 0;
   if (urlDatabase[req.params.shortURL]["uniqueVisitors"]) {
-    uniqueVisitorsTotal = urlDatabase[req.params.shortURL]["uniqueVisitors"].length
-  } 
-  const templateVars = { 
-    shortURL: req.params.shortURL, 
-    longURL: urlDatabase[req.params.shortURL]["longURL"], 
+    uniqueVisitorsTotal = urlDatabase[req.params.shortURL]["uniqueVisitors"].length;
+  }
+  const templateVars = {
+    shortURL: req.params.shortURL,
+    longURL: urlDatabase[req.params.shortURL]["longURL"],
     user: users[req.session.userId],
     visitsCount: urlDatabase[req.params.shortURL]["visitsCount"] || 0,
     uniqueVisitorsTotal: uniqueVisitorsTotal || 0,
     visits: urlDatabase[req.params.shortURL]["visits"] || [],
-   };
+  };
   res.render("urls_show", templateVars);
 });
 
 app.get("/u/:shortURL", (req, res) => {
   // Check that short URL exists
-  if (!Object.keys(urlDatabase).includes(req.params.shortURL)){
+  if (!Object.keys(urlDatabase).includes(req.params.shortURL)) {
     return res.status(404).redirect("/404");
   }
   const longURL = urlDatabase[req.params.shortURL]["longURL"];
@@ -106,19 +106,19 @@ app.get('/400', (req, res) => {
   const templateVars = { user: users[req.session.userId] };
   res.status('400');
   res.render('400', templateVars);
-})
+});
 
 app.get('/403', (req, res) => {
   const templateVars = { user: users[req.session.userId] };
   res.status('403');
   res.render('403', templateVars);
-})
+});
 
 app.get('/404', (req, res) => {
   const templateVars = { user: users[req.session.userId] };
   res.status('404');
   res.render('404', templateVars);
-})
+});
 
 // Catch-all route
 app.get('*', (req, res) => {
@@ -128,7 +128,7 @@ app.get('*', (req, res) => {
   } else {
     res.redirect("/login");
   }
-})
+});
 
 // ROUTES - POST/DELETE/PUT ROUTES
 
@@ -143,8 +143,7 @@ app.delete("/urls/:shortURL/delete", (req, res) => {
   if (req.session.userId === urlDatabase[shortURL]["userId"]) {
     delete urlDatabase[shortURL];
     res.redirect('/urls');
-  }
-  else {
+  } else {
     res.status('403').redirect('/403');
   }
 });
@@ -166,8 +165,7 @@ app.put("/urls/:id", (req, res) => {
   if (req.session.userId === urlDatabase[shortURL]["userId"]) {
     urlDatabase[shortURL] = { longURL: req.body.longURL, userId: req.session.userId };
     res.redirect(`/urls`);
-  }
-  else {
+  } else {
     res.status('403').redirect('/403');
   }
 });
@@ -180,7 +178,7 @@ app.post("/logout", (req, res) => {
 
 app.post("/register", (req, res) => {
   const userId = generateRandomString(users);
-  if (!(req.body.email) || !(req.body.password) ) {
+  if (!(req.body.email) || !(req.body.password)) {
     res.status('403').redirect('/400');
     return;
   }
@@ -202,8 +200,7 @@ app.post("/login", (req, res) => {
   if (bcrypt.compareSync(req.body.password, users[userId]["password"])) {
     req.session.userId = userId;
     res.redirect('/urls');
-  }
-  else {
+  } else {
     res.status('403').redirect('/403');
   }
 });

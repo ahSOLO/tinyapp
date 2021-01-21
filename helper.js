@@ -4,8 +4,8 @@ const generateRandomString = function(object) {
   let characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let redo = true;
   const len = 6; // Length of the random string
-  while(redo) {
-    for ( let i = 0; i < len; i++ ) {
+  while (redo) {
+    for (let i = 0; i < len; i++) {
       result += characters.charAt(Math.floor(Math.random() * characters.length));
     }
     redo = false;
@@ -17,7 +17,7 @@ const generateRandomString = function(object) {
     }
   }
   return result;
-}
+};
 
 const getUserByEmail = function(users, email) {
   for (let user in users) {
@@ -25,7 +25,7 @@ const getUserByEmail = function(users, email) {
       return user;
     }
   }
-}
+};
 
 const getUrlsByUserId = function(urls, id) {
   let output = {};
@@ -35,10 +35,10 @@ const getUrlsByUserId = function(urls, id) {
     }
   }
   return output;
-}
+};
 
 // Stretch Assignment - record analytics
-const recordAnalytics = function (req, urlDatabase) {
+const recordAnalytics = function(req, urlDatabase) {
   // Count visits
   urlDatabase[req.params.shortURL]["visitsCount"] = urlDatabase[req.params.shortURL]["visitsCount"] + 1 || 1;
   // Record unique visitors
@@ -52,13 +52,13 @@ const recordAnalytics = function (req, urlDatabase) {
   if (!urlDatabase[req.params.shortURL]["visits"]) {
     urlDatabase[req.params.shortURL]["visits"] = [];
   }
-  // Initially used the same random generation function as url ID and user ID to generate visitor ID, but I switched to a numeric count because it was more informative and there was no need for encryption here 
-  urlDatabase[req.params.shortURL]["visits"].unshift({ timestamp: new Date(), visitor: urlDatabase[req.params.shortURL]["visitsCount"]}); 
-}
+  // Initially used the same random generation function as url ID and user ID to generate visitor ID, but I switched to a numeric count because it was more informative and there was no need for encryption here
+  urlDatabase[req.params.shortURL]["visits"].unshift({ timestamp: new Date(), visitor: urlDatabase[req.params.shortURL]["visitsCount"]});
+};
 
-module.exports = { 
+module.exports = {
   generateRandomString,
   getUserByEmail,
   getUrlsByUserId,
   recordAnalytics,
- }
+};
