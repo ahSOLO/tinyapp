@@ -3,8 +3,9 @@ const generateRandomString = function(object) {
   let result           = '';
   let characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let redo = true;
+  const len = 6; // Length of the random string
   while(redo) {
-    for ( let i = 0; i < 6; i++ ) {
+    for ( let i = 0; i < len; i++ ) {
       result += characters.charAt(Math.floor(Math.random() * characters.length));
     }
     redo = false;
@@ -36,8 +37,28 @@ const getUrlsByUserId = function(urls, id) {
   return output;
 }
 
+// Stretch Assignment - record analytics
+const recordAnalytics = function (req, urlDatabase) {
+  // Count visits
+  urlDatabase[req.params.shortURL]["visitsCount"] = urlDatabase[req.params.shortURL]["visitsCount"] + 1 || 1;
+  // Record unique visitors
+  if (!urlDatabase[req.params.shortURL]["uniqueVisitors"]) {
+    urlDatabase[req.params.shortURL]["uniqueVisitors"] = [];
+  }
+  if (!urlDatabase[req.params.shortURL]["uniqueVisitors"].includes(req.session.userId)) {
+    urlDatabase[req.params.shortURL]["uniqueVisitors"].push(req.session.userId);
+  }
+  // Record individual visits
+  if (!urlDatabase[req.params.shortURL]["visits"]) {
+    urlDatabase[req.params.shortURL]["visits"] = [];
+  }
+  // Initially used the same random generation function as url ID and user ID to generate visitor ID, but I switched to a numeric count because it was more informative and there was no need for encryption here 
+  urlDatabase[req.params.shortURL]["visits"].unshift({ timestamp: new Date(), visitor: urlDatabase[req.params.shortURL]["visitsCount"]}); 
+}
+
 module.exports = { 
   generateRandomString,
   getUserByEmail,
   getUrlsByUserId,
+  recordAnalytics,
  }

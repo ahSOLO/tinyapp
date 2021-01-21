@@ -1,14 +1,19 @@
+// Express
 const express = require("express");
 const app = express();
 
+// 3rd Party Packages
 const bcrypt = require('bcrypt');
 
+// Constants
 const PORT = 8080;
 
+// Import Helper Functions
 const { 
   generateRandomString,
   getUserByEmail,
   getUrlsByUserId,
+  recordAnalytics,
  } = require("./helper");
 
 app.set("view engine", "ejs");
@@ -27,14 +32,10 @@ app.use(cookieSession({
 }))
 
 // Pseudo-database for URLs and users:
-const urlDatabase = {
-  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userId: "1a1a1a" },
-  "9sm5xK": { longURL: "http://www.google.com", userId: "1a1a1a" }
-};
-
+const urlDatabase = {};
 const users = {};
 
-// GET ROUTES
+// ROUTES - GET ROUTES
 
 // URL display routes
 app.get("/urls", (req, res) => {
@@ -54,7 +55,11 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
   if (!req.session.userId) {
-    res.redirect("/login");
+    return res.redirect("/login");
+  }
+  // Check that short URL exists
+  if (!Object.keys(urlDatabase).includes(req.params.shortURL)){
+    return res.status(404).redirect("/404");
   }
   let uniqueVisitorsTotal = 0;
   if (urlDatabase[req.params.shortURL]["uniqueVisitors"]) {
@@ -64,36 +69,29 @@ app.get("/urls/:shortURL", (req, res) => {
     shortURL: req.params.shortURL, 
     longURL: urlDatabase[req.params.shortURL]["longURL"], 
     user: users[req.session.userId],
-    visitsCount: urlDatabase[req.params.shortURL]["visitsCount"],
-    uniqueVisitorsTotal: uniqueVisitorsTotal,
-    visits: urlDatabase[req.params.shortURL]["visits"],
+    visitsCount: urlDatabase[req.params.shortURL]["visitsCount"] || 0,
+    uniqueVisitorsTotal: uniqueVisitorsTotal || 0,
+    visits: urlDatabase[req.params.shortURL]["visits"] || [],
    };
   res.render("urls_show", templateVars);
 });
 
 app.get("/u/:shortURL", (req, res) => {
+  // Check that short URL exists
+  if (!Object.keys(urlDatabase).includes(req.params.shortURL)){
+    return res.status(404).redirect("/404");
+  }
   const longURL = urlDatabase[req.params.shortURL]["longURL"];
-  // Implement Analytics
-  // Count visits
-  urlDatabase[req.params.shortURL]["visitsCount"] = urlDatabase[req.params.shortURL]["visitsCount"] + 1 || 1;
-  // Record unique visitors
-  if (!urlDatabase[req.params.shortURL]["uniqueVisitors"]) {
-    urlDatabase[req.params.shortURL]["uniqueVisitors"] = [];
-  }
-  if (!urlDatabase[req.params.shortURL]["uniqueVisitors"].includes(req.session.userId)) {
-    urlDatabase[req.params.shortURL]["uniqueVisitors"].push(req.session.userId);
-  }
-  // Record individual visits
-  if (!urlDatabase[req.params.shortURL]["visits"]) {
-    urlDatabase[req.params.shortURL]["visits"] = [];
-  }
-  urlDatabase[req.params.shortURL]["visits"].push({timestamp: new Date(), visitor: generateRandomString(urlDatabase[req.params.shortURL]["visits"].visitor)});
-
+  recordAnalytics(req, urlDatabase);
   res.redirect(longURL);
 });
 
 // Authentication routes
 app.get("/register", (req, res) => {
+  // Redirect if session id already exists
+  if (Object.keys(users).includes(req.session.userId)) {
+    return res.redirect("/urls");
+  }
   const templateVars = { user: users[req.session.userId] };
   res.render("urls_register", templateVars);
 });
@@ -102,18 +100,6 @@ app.get("/login", (req, res) => {
   const templateVars = { user: users[req.session.userId] };
   res.render("urls_login", templateVars);
 });
-
-// app.get("/", (req, res) => {
-//   res.send("Hello!");
-// });
-
-// app.get("/urls.json", (req, res) => {
-//   res.json(urlDatabase);
-// });
-
-// app.get("/hello", (req, res) => {
-//   res.send("<html><body>Hello <b>World</b></body></html>\n");
-// });
 
 // Error Routes
 app.get('/400', (req, res) => {
@@ -128,28 +114,47 @@ app.get('/403', (req, res) => {
   res.render('403', templateVars);
 })
 
-app.get('*', (req, res) => {
+app.get('/404', (req, res) => {
   const templateVars = { user: users[req.session.userId] };
   res.status('404');
   res.render('404', templateVars);
 })
 
-// POST ROUTES
+// Catch-all route
+app.get('*', (req, res) => {
+  const userId = req.session.userId;
+  if (userId) {
+    res.redirect("/urls");
+  } else {
+    res.redirect("/login");
+  }
+})
+
+// ROUTES - POST/DELETE/PUT ROUTES
 
 // Delete URL
 app.delete("/urls/:shortURL/delete", (req, res) => {
+  // Authentication
+  if (!req.session.userId) {
+    return res.status('403').redirect('/403');
+  }
   const shortURL = req.params.shortURL;
+  // Authorization
   if (req.session.userId === urlDatabase[shortURL]["userId"]) {
     delete urlDatabase[shortURL];
     res.redirect('/urls');
   }
   else {
-    res.redirect('/403');
+    res.status('403').redirect('/403');
   }
 });
 
 // Create URL
 app.post("/urls", (req, res) => {
+  // Authentication
+  if (!req.session.userId) {
+    return res.status('403').redirect('/403');
+  }
   const shortURL = generateRandomString(urlDatabase);
   urlDatabase[shortURL] = { longURL: req.body.longURL, userId: req.session.userId };
   res.redirect(`/urls/${shortURL}`);
@@ -160,10 +165,10 @@ app.put("/urls/:id", (req, res) => {
   const shortURL = req.params.id;
   if (req.session.userId === urlDatabase[shortURL]["userId"]) {
     urlDatabase[shortURL] = { longURL: req.body.longURL, userId: req.session.userId };
-    res.redirect(`/urls/${shortURL}`);
+    res.redirect(`/urls`);
   }
   else {
-    res.redirect('/403');
+    res.status('403').redirect('/403');
   }
 });
 
@@ -176,11 +181,11 @@ app.post("/logout", (req, res) => {
 app.post("/register", (req, res) => {
   const userId = generateRandomString(users);
   if (!(req.body.email) || !(req.body.password) ) {
-    res.redirect('/400');
+    res.status('403').redirect('/400');
     return;
   }
   if (getUserByEmail(users, req.body.email)) {
-    res.redirect('/400');
+    res.status('403').redirect('/400');
     return;
   }
   const hashedPass = bcrypt.hashSync(req.body.password, 10);
@@ -192,14 +197,14 @@ app.post("/register", (req, res) => {
 app.post("/login", (req, res) => {
   const userId = getUserByEmail(users, req.body.email);
   if (!userId) {
-    res.redirect('/403');
+    return res.status('403').redirect('/403');
   }
   if (bcrypt.compareSync(req.body.password, users[userId]["password"])) {
     req.session.userId = userId;
     res.redirect('/urls');
   }
   else {
-    res.redirect('/403');
+    res.status('403').redirect('/403');
   }
 });
 
