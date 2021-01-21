@@ -13,7 +13,10 @@ const {
 
 app.set("view engine", "ejs");
 
-// Middleware: body-parser, cookie-parser
+// Middleware: method-override, body-parser, cookie-parser
+const methodOverride = require('method-override');
+app.use(methodOverride('_method'))
+
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
@@ -107,7 +110,7 @@ app.get('*', (req, res) => {
 // POST ROUTES
 
 // Delete URL
-app.post("/urls/:shortURL/delete", (req, res) => {
+app.delete("/urls/:shortURL/delete", (req, res) => {
   const shortURL = req.params.shortURL;
   if (req.session.userId === urlDatabase[shortURL]["userId"]) {
     delete urlDatabase[shortURL];
@@ -126,7 +129,7 @@ app.post("/urls", (req, res) => {
 });
 
 // Update URL
-app.post("/urls/:id", (req, res) => {
+app.put("/urls/:id", (req, res) => {
   const shortURL = req.params.id;
   if (req.session.userId === urlDatabase[shortURL]["userId"]) {
     urlDatabase[shortURL] = { longURL: req.body.longURL, userId: req.session.userId };

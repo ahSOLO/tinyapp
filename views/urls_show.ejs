@@ -17,7 +17,7 @@
     </div>
     <div class="card-footer text-muted"></div>
     <h2>Edit</h2>
-    <form class="form-group mb-2" action="/urls/<%= shortURL %>" method="POST">
+    <form class="form-group mb-2" action="/urls/<%= shortURL %>?_method=PUT" method="POST">
       <label for="longURL">Enter an updated URL:</label>
         <input class="form-control w-50 mx-auto" type="text" name="longURL" placeholder="http://">
       <button type="submit" class="btn btn-primary">Submit</button>
