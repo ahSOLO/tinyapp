@@ -9,8 +9,10 @@ const generateRandomString = function(object) {
     }
     redo = false;
     // Check for duplicates
-    for (const key of Object.keys(object)) {
-      if (key === result) redo = true;
+    if (object) { // skip if object is undefined - used in stretch assignment for generation of first visitor ID
+      for (const key of Object.keys(object)) {
+        if (key === result) redo = true;
+      }
     }
   }
   return result;

@@ -56,12 +56,40 @@ app.get("/urls/:shortURL", (req, res) => {
   if (!req.session.userId) {
     res.redirect("/login");
   }
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]["longURL"], user: users[req.session.userId] };
+  let uniqueVisitorsTotal = 0;
+  if (urlDatabase[req.params.shortURL]["uniqueVisitors"]) {
+    uniqueVisitorsTotal = urlDatabase[req.params.shortURL]["uniqueVisitors"].length
+  } 
+  const templateVars = { 
+    shortURL: req.params.shortURL, 
+    longURL: urlDatabase[req.params.shortURL]["longURL"], 
+    user: users[req.session.userId],
+    visitsCount: urlDatabase[req.params.shortURL]["visitsCount"],
+    uniqueVisitorsTotal: uniqueVisitorsTotal,
+    visits: urlDatabase[req.params.shortURL]["visits"],
+   };
   res.render("urls_show", templateVars);
 });
 
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL]["longURL"];
+  // Implement Analytics
+  // Count visits
+  urlDatabase[req.params.shortURL]["visitsCount"] = urlDatabase[req.params.shortURL]["visitsCount"] + 1 || 1;
+  // Record unique visitors
+  if (!urlDatabase[req.params.shortURL]["uniqueVisitors"]) {
+    urlDatabase[req.params.shortURL]["uniqueVisitors"] = [];
+  }
+  if (!urlDatabase[req.params.shortURL]["uniqueVisitors"].includes(req.session.userId)) {
+    urlDatabase[req.params.shortURL]["uniqueVisitors"].push(req.session.userId);
+  }
+  // Record individual visits
+  if (!urlDatabase[req.params.shortURL]["visits"]) {
+    urlDatabase[req.params.shortURL]["visits"] = [];
+  }
+  urlDatabase[req.params.shortURL]["visits"].push({timestamp: new Date(), visitor: generateRandomString(urlDatabase[req.params.shortURL]["visits"].visitor)});
+  console.log(urlDatabase);
+
   res.redirect(longURL);
 });
 
