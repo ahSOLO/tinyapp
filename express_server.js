@@ -61,6 +61,7 @@ app.get("/urls/:shortURL", (req, res) => {
   if (!Object.keys(urlDatabase).includes(req.params.shortURL)) {
     return res.status(404).redirect("/404");
   }
+  // Track unique visitors for analytics
   let uniqueVisitorsTotal = 0;
   if (urlDatabase[req.params.shortURL]["uniqueVisitors"]) {
     uniqueVisitorsTotal = urlDatabase[req.params.shortURL]["uniqueVisitors"].length;
@@ -69,8 +70,9 @@ app.get("/urls/:shortURL", (req, res) => {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL]["longURL"],
     user: users[req.session.userId],
+    // Track visits for analytics
     visitsCount: urlDatabase[req.params.shortURL]["visitsCount"] || 0,
-    uniqueVisitorsTotal: uniqueVisitorsTotal || 0,
+    uniqueVisitorsTotal: uniqueVisitorsTotal,
     visits: urlDatabase[req.params.shortURL]["visits"] || [],
   };
   res.render("urls_show", templateVars);
