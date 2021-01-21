@@ -9,7 +9,7 @@ const {
   generateRandomString,
   getUserByEmail,
   getUrlsByUserId,
- } = require("./utility");
+ } = require("./helper");
 
 app.set("view engine", "ejs");
 
