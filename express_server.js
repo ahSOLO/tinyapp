@@ -88,7 +88,6 @@ app.get("/u/:shortURL", (req, res) => {
     urlDatabase[req.params.shortURL]["visits"] = [];
   }
   urlDatabase[req.params.shortURL]["visits"].push({timestamp: new Date(), visitor: generateRandomString(urlDatabase[req.params.shortURL]["visits"].visitor)});
-  console.log(urlDatabase);
 
   res.redirect(longURL);
 });
