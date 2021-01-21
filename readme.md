@@ -4,13 +4,15 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## Screenshots
 
+Host any number of shortened URLs on TinyApp's intuitive interface:
+
 !["Screenshot of URLs Page"](https://github.com/ahSOLO/tinyapp/blob/master/docs/urls-page.png)
 
-Host any number of shortened URLs on TinyApp's intuitive interface.
+
+Track analytics associated with the shortened URL:
 
 !["Screenshot of Edit Page"](https://github.com/ahSOLO/tinyapp/blob/master/docs/edit-page.png)
 
-Track analytics associated with the short URL.
 
 ## Dependencies
 
